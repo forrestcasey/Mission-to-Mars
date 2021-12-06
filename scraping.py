@@ -27,7 +27,8 @@ def scrape_all():
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
-        "last_modified": dt.datetime.now()
+        "last_modified": dt.datetime.now(),
+        "hemispheres": hemispheres(browser)
     }
 
 # Stop webdriver and return data
@@ -120,6 +121,40 @@ if __name__ == "__main__":
     print(scrape_all())
 
 
+# Deliv 2
+
+def hemispheres(browser):
+    
+    url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    browser.visit(url)
+
+    # Dict
+    hemisphere_image_urls = []
+
+    
+    for i in range(4):
+        browser.find_by_css('a.product-item h3')[i].click()
+        hemisphere_data = scrape_hemisphere(browser.html)
+        hemisphere_image_urls.append(hemisphere_data)
+        browser.back()
+    return hemisphere_image_urls
+
+
+def scrape_hemisphere(html_text):
+    
+    hemi_soup = soup(html_text, "html.parser")
+    
+    try:
+        title_elem = hemi_soup.find("h2", class_="title").get_text()
+        sample_elem = hemi_soup.find("a", text="Sample").get("href")
+    except AttributeError:
+        title_elem = None
+        sample_elem = None
+    hemispheres = {
+        "title": title_elem,
+        "img_url": sample_elem
+    }
+    return hemispheres
 
 
 
